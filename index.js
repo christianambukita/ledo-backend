@@ -48,11 +48,13 @@ problemSchema.pre("save", function (next) {
   next();
 });
 
-const Problem = mongoose.model("problems_collection", problemSchema);
+const Problem = mongoose.model("Problem", problemSchema);
 
-app.get("/problem-list", async (req, res) => {
+app.get("/problem-list/:collectionName", async (req, res) => {
+  const collectionName = req.params.collectionName;
   try {
-    const problemList = await Problem.find();
+    const ProblemModel = mongoose.model(collectionName, problemSchema);
+    const problemList = await ProblemModel.find();
     return res.json({ problemList });
   } catch (err) {
     console.error("Error getting problem list", err);
@@ -60,8 +62,11 @@ app.get("/problem-list", async (req, res) => {
   }
 });
 
-app.post("/problem", async (req, res) => {
-  const problem = new Problem(req.body);
+app.post("/problem/:collectionName", async (req, res) => {
+  const collectionName = req.params.collectionName;
+  const ProblemModel = mongoose.model(collectionName, problemSchema);
+
+  const problem = new ProblemModel(req.body);
   try {
     await problem.save();
     return res.status(200).end();
@@ -74,7 +79,10 @@ app.post("/problem", async (req, res) => {
   }
 });
 
-app.patch("/problem", async (req, res) => {
+app.patch("/problem/:collectionName", async (req, res) => {
+  const collectionName = req.params.collectionName;
+  const ProblemModel = mongoose.model(collectionName, problemSchema);
+
   const id = req.query.id;
   const updates = Object.keys(req.body);
   const allowedUpdates = ["name", "grade", "grips", "author", "comment"];
@@ -87,14 +95,13 @@ app.patch("/problem", async (req, res) => {
   }
 
   try {
-    const problem = await Problem.findOne({ _id: id });
+    const problem = await ProblemModel.findOne({ _id: id });
 
     if (!problem) {
       return res.status(404).send();
     }
 
     updates.forEach((update) => (problem[update] = req.body[update]));
-    console.log({ updates, problem, body: req.body });
     await problem.save();
     res.send(problem);
   } catch (error) {
@@ -102,10 +109,13 @@ app.patch("/problem", async (req, res) => {
   }
 });
 
-app.delete("/problem", (req, res) => {
+app.delete("/problem/:collectionName", (req, res) => {
+  const collectionName = req.params.collectionName;
+  const ProblemModel = mongoose.model(collectionName, problemSchema);
+
   const { id } = req.query;
 
-  Problem.findOneAndDelete({ _id: id })
+  ProblemModel.findOneAndDelete({ _id: id })
     .then((result) => {
       if (!result) {
         res.status(404).send(`Problem with id ${id} not found`);
