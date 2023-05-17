@@ -18,27 +18,35 @@ const problemSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
-    unique: true
+    unique: true,
   },
   grade: {
     type: String,
-    required: true
+    required: true,
   },
   grips: {
     type: Object,
-    required: true
+    required: true,
   },
   author: {
     type: String,
-    required: false
+    required: false,
   },
   comment: {
     type: String,
-    required: false
+    required: false,
+  },
+  isLoop: {
+    type: String,
+    required: false,
+  },
+  loopOrder: {
+    type: String,
+    required: false,
   },
   timestamp: {
-    type: Date
-  }
+    type: Date,
+  },
 });
 
 problemSchema.pre("save", function (next) {
@@ -134,7 +142,7 @@ mongoose
     `mongodb+srv://${userName}:${userPassword}@${databaseName}.skhneed.mongodb.net/?retryWrites=true&w=majority`,
     {
       useNewUrlParser: true,
-      useUnifiedTopology: true
+      useUnifiedTopology: true,
     }
   )
   .then(() => {
