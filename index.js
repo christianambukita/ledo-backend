@@ -37,11 +37,11 @@ const problemSchema = new mongoose.Schema({
     required: false,
   },
   isLoop: {
-    type: String,
+    type: Boolean,
     required: false,
   },
   loopOrder: {
-    type: String,
+    type: Array,
     required: false,
   },
   timestamp: {
